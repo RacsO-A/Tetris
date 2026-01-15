@@ -1,0 +1,7 @@
+#define BAR_COLOR    "\033[48;2;6;86;158m"
+#define L_COLOR      "\033[48;2;158;28;7m"
+#define BL_COLOR     "\033[48;2;199;79;7m"
+#define N_COLOR      "\033[48;2;0;14;138m"
+#define BN_COLOR     "\033[48;2;54;158;25m"
+#define T_COLOR      "\033[48;2;65;7;158m"
+#define BLOCK_COLOR  "\033[48;2;235;237;10m"
