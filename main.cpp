@@ -60,31 +60,69 @@ class tetris_board {
 		tetris_board(std::vector<std::vector<color_char>> board, piece current_piece) :
 			board(board), current_piece(current_piece) {}
 		void tick(); // Does a game tick to the board
+
+		void update_board_piece(color_char color, int offset);
+		bool cp_will_collide();
 };
 
+// Updates the board to match the current piece with some up/down offset
+// offset is how many to go up or down. +1 is down 1 and -1 is up 1 on the board
+void tetris_board::update_board_piece(color_char color, int offset) {
+	std::vector<coord> current_pos = this->current_piece.get_pos();
+
+	for (int i = 0; i < current_pos.size(); i++) {
+		coord block = current_pos.at(i);
+
+		board.at(block.x + offset).at(block.y) = color;
+	}
+}
+
+bool tetris_board::cp_will_collide() {
+	std::vector<coord> cp_pos = this->current_piece.get_bottom_coords();
+
+	for (int i = 0; i < cp_pos.size(); i++) {
+		coord block = cp_pos.at(i);
+
+		if (this->board.at(block.x + 1).at(block.y).get_color() != "") {
+			return true;
+		}
+	}
+	return false;
+}
+
 void tetris_board::tick() {
-	coord current_pos = this->current_piece.get_pos();
-	if (current_pos.x == 19) { // If piece is already at the bottom of the board
+	int bottom_cp = this->current_piece.get_lowest_pos();
+	std::vector<coord> current_pos = this->current_piece.get_pos();
+
+
+	if (bottom_cp == 19) { // If piece is already at the bottom of the board
 		std::cout << "entered bottom";
-		this->board.at(current_pos.x).at(current_pos.y) = 
-			color_char(this->current_piece.get_color(), ' '); // Updates the square under to be current piece
-		this->current_piece.update_coord(coord(0, rand() % 10)); // Generates a new piece at the top randomly
+		this->update_board_piece(
+			color_char(this->current_piece.get_color(), ' '), 0); // "Freezes" the piece in place
+		
+		this->current_piece.set_random_tetrino(); // Generates a new random piece at the top
 		return;
 	}
 
-	std::string square_under_color =
-		this->board.at(current_pos.x + 1).at(current_pos.y).get_color();
+	bool current_piece_will_collide = this->cp_will_collide();
 
-	if (square_under_color == "") { // If square under is empty, move the current down
-		this->board.at(current_pos.x + 1).at(current_pos.y) = 
-			color_char(this->current_piece.get_color(), ' '); // Update square under
-		this->board.at(current_pos.x).at(current_pos.y) = 
-			color_char("", ' ');// Update previous square to be empty
+	if (!current_piece_will_collide) { // If current piece will not colide with a piece on the grid, decrement its position
+		std::cout << "No collide\n";
+		this->update_board_piece(
+			color_char("", ' '), 0); // Update where the piece is to be empty
+
+		this->update_board_piece(
+			color_char(this->current_piece.get_color(), ' '), 1); // Update squares under to be current piece
+
 		this->current_piece.decrement_coord(); // Moves the current piece down
 	} else {
-		this->board.at(current_pos.x).at(current_pos.y) = 
-			color_char(this->current_piece.get_color(), ' '); // Updates the square under to be current piece
-		this->current_piece.update_coord(coord(0, rand() % 10)); // Generates a new piece at the top randomly
+		std::cout << "Yes collide\n";
+
+		this->update_board_piece(
+			color_char(this->current_piece.get_color(), ' '), 0); // "Freezes" the piece in place
+		
+		this->current_piece.set_random_tetrino(); // Generates a new random piece at the top
+		return;
 	}
 }
 
@@ -110,70 +148,15 @@ int main() {
 		board.push_back(row);
 	}
 
-	tetris_board t_board(board, piece(coord(0,0), BAR_COLOR, 'n'));
+	piece new_tetrino;
+	new_tetrino.set_random_tetrino();
+	tetris_board t_board(board, new_tetrino);
 
+	
 	while (true) {
 		t_board.tick();
 		print_board(t_board.board);
-		std::this_thread::sleep_for(0.02s);
+		std::this_thread::sleep_for(0.1s);
 		std::cout << " ";
 	}
-
-
-
-	/*
-	for (int i = 0; i < 8; i++) {
-		colors.at(0).print();
-	}
-	std::cout << " ";
-	for (int i = 0; i < 4; i++) {
-		colors.at(3).print();
-	}
-	std::cout << "     ";
-	for (int i = 0; i < 4; i++) {
-		colors.at(4).print();
-	}
-	std::cout << " ";
-	for (int i = 0; i < 2; i++) {
-		colors.at(2).print();
-	}
-	std::cout << "         ";
-	for (int i = 0; i < 2; i++) {
-		colors.at(1).print();
-	}
-	std::cout << "   ";
-	for (int i = 0; i < 2; i++) {
-		colors.at(5).print();
-	}
-	std::cout << "   ";
-	for (int i = 0; i < 4; i++) {
-		colors.at(6).print();
-	}
-	std::cout << "\n";
-
-	std::cout << "           ";
-	for (int i = 0; i < 4; i++) {
-		colors.at(3).print();
-	}
-	std::cout << " ";
-	for (int i = 0; i < 4; i++) {
-		colors.at(4).print();
-	}
-	std::cout << "   ";
-	for (int i = 0; i < 6; i++) {
-		colors.at(2).print();
-	}
-	std::cout << " ";
-	for (int i = 0; i < 6; i++) {
-		colors.at(1).print();
-	}
-	std::cout << " ";
-	for (int i = 0; i < 6; i++) {
-		colors.at(5).print();
-	}
-	std::cout << " ";
-	for (int i = 0; i < 4; i++) {
-		colors.at(6).print();
-	}
-	std::cout << "\n";*/
 }
