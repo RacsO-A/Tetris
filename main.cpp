@@ -101,6 +101,9 @@ void tetris_board::tick() {
 			color_char(this->current_piece.get_color(), ' '), 0); // "Freezes" the piece in place
 		
 		this->current_piece.set_random_tetrino(); // Generates a new random piece at the top
+		this->update_board_piece(
+			color_char(this->current_piece.get_color(), ' '), 0); // Renders it at the top of the board
+		
 		return;
 	}
 
@@ -111,10 +114,9 @@ void tetris_board::tick() {
 		this->update_board_piece(
 			color_char("", ' '), 0); // Update where the piece is to be empty
 
-		this->update_board_piece(
-			color_char(this->current_piece.get_color(), ' '), 1); // Update squares under to be current piece
-
 		this->current_piece.decrement_coord(); // Moves the current piece down
+		this->update_board_piece(
+			color_char(this->current_piece.get_color(), ' '), 0); // Renders the current piece
 	} else {
 		std::cout << "Yes collide\n";
 
@@ -122,6 +124,9 @@ void tetris_board::tick() {
 			color_char(this->current_piece.get_color(), ' '), 0); // "Freezes" the piece in place
 		
 		this->current_piece.set_random_tetrino(); // Generates a new random piece at the top
+		this->update_board_piece(
+			color_char(this->current_piece.get_color(), ' '), 0); // Renders it at the top of the board
+		
 		return;
 	}
 }
@@ -160,3 +165,4 @@ int main() {
 		std::cout << " ";
 	}
 }
+
