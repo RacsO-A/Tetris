@@ -38,10 +38,16 @@ class piece {
 		std::vector<coord> get_pos();
 		std::string get_color();
 		std::vector<coord> get_bottom_coords();
+		std::vector<coord> get_left_coords();
+		std::vector<coord> get_right_coords();
 
 		void set_random_tetrino();
 
 		void update_coord(std::vector<coord> c);
+		void move_left();
+		void move_right();
+		int left_most_coord();
+		int right_most_coord();
 		void decrement_coord();
 };
 
@@ -89,17 +95,107 @@ std::vector<coord> piece::get_bottom_coords() {
 	return bottom_coords;
 }
 
+// Gets the coords that are at the left of a piece
+std::vector<coord> piece::get_left_coords() {
+	std::vector<coord> left_coords;
+
+	for (int i = 0; i < this->pos.size(); i++) {
+		int add = true;
+		for (int j = 0; j < left_coords.size(); j++) { // This loop checks if an entry of bottom_coords already holds 
+			if (left_coords.at(j).x == this->pos.at(i).x) { // If on same x level, check which is right
+				if (left_coords.at(j).y < this->pos.at(i).y) { // If there is already a block to the left
+					add = false;
+					break;
+				} else {
+					left_coords.erase(left_coords.begin() + j);
+					break;
+				}
+			}
+		}
+		if (add) {
+			left_coords.push_back(this->pos.at(i));
+		}
+	}
+	return left_coords;
+}
+
+// Gets the coords that are at the right of a piece
+std::vector<coord> piece::get_right_coords() {
+	std::vector<coord> right_coords;
+
+	for (int i = 0; i < this->pos.size(); i++) {
+		int add = true;
+		for (int j = 0; j < right_coords.size(); j++) { // This loop checks if an entry of bottom_coords already holds 
+			if (right_coords.at(j).x == this->pos.at(i).x) { // If on same x level, check which is right
+				if (right_coords.at(j).y > this->pos.at(i).y) { // If there is already a block to the left
+					add = false;
+					break;
+				} else {
+					right_coords.erase(right_coords.begin() + j);
+					break;
+				}
+			}
+		}
+		if (add) {
+			right_coords.push_back(this->pos.at(i));
+		}
+	}
+	return right_coords;
+}
+
 // Sets the current piece to a random tetrino
 void piece::set_random_tetrino() {
 	int new_t_idx = rand() % 7;
 	
 	this->pos = all_tetrinos.at(new_t_idx);
+	
+	/*
+	int r = (rand() % 7) - 3;
+	for (int i = 0; i < this->pos.size(); i++) {
+		this->pos.at(i).y = this->pos.at(i).y + r; 
+	}
+	*/
+
 	this->color = tetrino_colors.at(new_t_idx);
 }
 
 // Updates the coords of the piece to c
 void piece::update_coord(std::vector<coord> c) {
 	this->pos = c;
+}
+
+void piece::move_left() {
+	for (int i = 0; i < this->pos.size(); i++) {
+		this->pos.at(i).y--;
+	}
+}
+
+void piece::move_right() {
+	for (int i = 0; i < this->pos.size(); i++) {
+		this->pos.at(i).y++;
+	}
+}
+
+int piece::left_most_coord() {
+	int left = this->pos.at(0).y;
+
+	for (int i = 1; i < this->pos.size(); i++) {
+		if (left > this->pos.at(i).y) {
+			left = this->pos.at(i).y;
+		}
+	}
+	return left;
+}
+	
+int piece::right_most_coord() {
+	int right = this->pos.at(0).y;
+
+	for (int i = 1; i < this->pos.size(); i++) {
+		if (right < this->pos.at(i).y) {
+			right = this->pos.at(i).y;
+		}
+	}
+	return right;
 }
 
 // Decrements all of the tetrinos pos to simulate it going down 1 tile on board
