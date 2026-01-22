@@ -5,13 +5,13 @@
 #include "color.hpp"
 
 const std::vector<std::vector<coord>> all_tetrinos 
-	= {{{0, 2}, {0 ,3}, {0, 4}, {0, 5}}, // Bar
-	   {{1, 2}, {1, 3}, {1, 4}, {0, 4}}, // L
-	   {{1, 2}, {1, 3}, {1, 4}, {0, 2}}, // Backwards L
-	   {{0, 2}, {0, 3}, {1, 3}, {1, 4}}, // N
-	   {{1, 2}, {1, 3}, {0, 3}, {0, 4}}, // Backwards N
-	   {{1, 2}, {0, 3}, {1, 3}, {1, 4}}, // T
-	   {{0, 2}, {1, 2}, {0, 3}, {1, 3}}  // Block
+	= {{{0, 4}, {0, 5}, {0, 6}, {0, 7}}, // Bar
+	   {{1, 4}, {1, 5}, {1, 6}, {0, 6}}, // L
+	   {{1, 4}, {1, 5}, {1, 6}, {0, 4}}, // Backwards L
+	   {{0, 4}, {0, 5}, {1, 5}, {1, 6}}, // N
+	   {{1, 4}, {1, 5}, {0, 5}, {0, 6}}, // Backwards N
+	   {{1, 4}, {0, 5}, {1, 5}, {1, 6}}, // T
+	   {{0, 4}, {1, 4}, {0, 5}, {1, 5}}  // Block
 	};
 
 const std::vector<std::string> tetrino_colors 
@@ -28,7 +28,7 @@ class piece {
 		std::vector<coord> pos; // The components of the pieces starting
 					// at (0,0)
 		std::string color; // Color of the piece
-		//coord rot; // The component that pieces will rotate around
+		//coord rot; // The component that pieces will rotate around, this should change whenever the pos is changed
 		
 	public:
 		piece() : pos({}), color("") {}
@@ -65,7 +65,8 @@ std::string piece::get_color() {
 	return this->color;
 }
 
-std::vector<coord> piece::get_bottom_coords() {
+// Gets the coords that are at the bottom of a piece
+std::vector<coord> piece::get_bottom_coords() { 
 	std::vector<coord> bottom_coords;
 
 	for (int i = 0; i < this->pos.size(); i++) {
@@ -88,6 +89,7 @@ std::vector<coord> piece::get_bottom_coords() {
 	return bottom_coords;
 }
 
+// Sets the current piece to a random tetrino
 void piece::set_random_tetrino() {
 	int new_t_idx = rand() % 7;
 	
@@ -95,14 +97,17 @@ void piece::set_random_tetrino() {
 	this->color = tetrino_colors.at(new_t_idx);
 }
 
+// Updates the coords of the piece to c
 void piece::update_coord(std::vector<coord> c) {
 	this->pos = c;
 }
 
+// Decrements all of the tetrinos pos to simulate it going down 1 tile on board
 void piece::decrement_coord() {
 	for (int i = 0; i < this->pos.size(); i++) {
 		this->pos.at(i).x++;
 	}
 }
+
 
 
